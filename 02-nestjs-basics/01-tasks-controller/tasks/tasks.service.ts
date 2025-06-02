@@ -4,6 +4,7 @@ import { Task } from "./task.model";
 @Injectable()
 export class TasksService {
   private tasks: Task[] = [];
+  private counterId: number = 1;
 
   getAllTasks(): Task[] {
     return this.tasks;
@@ -19,12 +20,12 @@ export class TasksService {
   }
 
   createTask(task: Task): Task {
-    const { id = null, title, description, status } = task;
+    const { title, description, status } = task;
     const newTask = {
-      id: id,
-      title: title,
-      description: description,
-      status: status,
+      id: String(this.counterId++),
+      title,
+      description,
+      status,
     };
 
     this.tasks.push(newTask);
@@ -39,9 +40,9 @@ export class TasksService {
     if (!foundedTask)
       throw new NotFoundException(`Not found task with id ${id}`);
 
-    foundedTask.description = description;
-    foundedTask.title = title;
-    foundedTask.status = status;
+    if (title) foundedTask.title = title;
+    if (description) foundedTask.description = description;
+    if (status) foundedTask.status = status;
 
     return foundedTask;
   }
