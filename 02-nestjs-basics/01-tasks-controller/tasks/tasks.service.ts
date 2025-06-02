@@ -41,7 +41,7 @@ export class TasksService {
       throw new NotFoundException(`Not found task with id ${id}`);
 
     if (title) foundedTask.title = title;
-    if (description) foundedTask.description = description;
+    if (description) foundedTask.description = description; 
     if (status) foundedTask.status = status;
 
     return foundedTask;
