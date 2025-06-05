@@ -4,14 +4,56 @@ import { Task } from "./task.model";
 @Injectable()
 export class TasksService {
   private tasks: Task[] = [];
+  private counterId: number = 1;
 
-  getAllTasks(): Task[] {}
+  getAllTasks(): Task[] {
+    return this.tasks;
+  }
 
-  getTaskById(id: string): Task {}
+  getTaskById(id: string): Task {
+    const foundedTask = this.tasks.find((task) => task.id === id);
 
-  createTask(task: Task): Task {}
+    if (!foundedTask)
+      throw new NotFoundException(`Not found task with id ${id}`);
 
-  updateTask(id: string, update: Task): Task {}
+    return foundedTask;
+  }
 
-  deleteTask(id: string): Task {}
+  createTask(task: Task): Task {
+    const { title, description, status } = task;
+    const newTask = {
+      id: String(this.counterId++),
+      title,
+      description,
+      status,
+    };
+
+    this.tasks.push(newTask);
+
+    return newTask;
+  }
+
+  updateTask(id: string, update: Task): Task {
+    const { title, description, status } = update;
+    const foundedTask = this.tasks.find((task) => task.id === id);
+
+    if (!foundedTask)
+      throw new NotFoundException(`Not found task with id ${id}`);
+
+    if (title) foundedTask.title = title;
+    if (description) foundedTask.description = description; 
+    if (status) foundedTask.status = status;
+
+    return foundedTask;
+  }
+
+  deleteTask(id: string): Task {
+    const foundedTask = this.tasks.find((task) => task.id === id);
+    if (!foundedTask)
+      throw new NotFoundException(`Not found task with id ${id}`);
+
+    this.tasks = this.tasks.filter((task) => task.id !== id);
+
+    return foundedTask;
+  }
 }
