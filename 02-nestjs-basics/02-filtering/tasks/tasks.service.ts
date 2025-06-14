@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { Task, TaskStatus } from "./task.model";
 
 @Injectable()
@@ -36,9 +36,41 @@ export class TasksService {
     },
   ];
 
-  getFilteredTasks(
-    status?: TaskStatus,
-    page?: number,
-    limit?: number,
-  ): Task[] {}
+  getFilteredTasks(status?: TaskStatus, page?: number, limit?: number): Task[] {
+    let filteredTasks = this.tasks;
+
+    if (page < 0 || limit < 0) {
+      throw new BadRequestException({
+        message: "Only positive numbers in params",
+        statusCode: 400,
+      });
+    }
+
+    if (status) {
+      filteredTasks = this.tasks.filter((task) => task.status === status);
+
+      if (!Object.values(TaskStatus).includes(status)) {
+        throw new BadRequestException({
+          message: "Not valid status",
+          statusCode: 400,
+        });
+      }
+
+      if (filteredTasks.length === 0) {
+        throw new BadRequestException({
+          message: "Not found task",
+          statusCode: 404,
+        });
+      }
+    }
+
+    if (page && limit) {
+      const start = (page - 1) * limit;
+      const end = start + limit;
+
+      return filteredTasks.slice(start, end);
+    }
+
+    return filteredTasks;
+  }
 }
