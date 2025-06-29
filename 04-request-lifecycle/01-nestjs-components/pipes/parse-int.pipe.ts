@@ -9,4 +9,3 @@ export class ParseIntPipe implements PipeTransform {
 
     return parseInt(value);
   }
-}

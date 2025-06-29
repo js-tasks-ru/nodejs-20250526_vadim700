@@ -6,4 +6,3 @@ export class LoggingMiddleware implements NestMiddleware {
     console.log(`[${req.method}] ${res.req.originalUrl} `);
     next();
   }
-}
