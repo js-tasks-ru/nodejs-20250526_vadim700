@@ -27,11 +27,15 @@ export class TasksService {
     };
     this.tasks.push(task);
 
-    this.notificationsService.sendEmail(
-      this.usersService.getUserById(assignedTo).email,
-      `Новая задача`,
-      `Вы назначены ответственным за задачу: \"${task.title}\"`,
-    );
+    if (this.usersService.getUserById(assignedTo).email.trim()) {
+      await this.notificationsService.sendEmail(
+        this.usersService.getUserById(assignedTo).email,
+        `Новая задача`,
+        `Вы назначены ответственным за задачу: \"${task.title}\"`,
+      );
+    } else {
+      throw new BadRequestException("The email field should not be empty");
+    }
 
     return task;
   }
@@ -48,14 +52,16 @@ export class TasksService {
       throw new NotFoundException("Такого пользователя не существует");
     }
 
-    if (!this.usersService.getUserById(task.assignedTo).phone) {
-      throw new BadRequestException("Номер телефона не должен быть пустым");
+    if (this.usersService.getUserById(task.assignedTo).phone.trim()) {
+      await this.notificationsService.sendSMS(
+        this.usersService.getUserById(task.assignedTo).phone,
+        `Статус задачи \"${task.title}\" обновлён на \"${task.status}\"`,
+      );
+    } else {
+      throw new BadRequestException(
+        "The phone number field should not be empty",
+      );
     }
-
-    this.notificationsService.sendSMS(
-      this.usersService.getUserById(task.assignedTo).phone,
-      `Статус задачи \"${task.title}\" обновлён на \"${task.status}\"`,
-    );
 
     return task;
   }
