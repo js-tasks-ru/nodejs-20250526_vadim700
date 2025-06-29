@@ -15,3 +15,4 @@ export class RolesGuard implements CanActivate {
 
     return userRole === "admin";
   }
+}
